@@ -1,0 +1,6 @@
+host=#=localhost
+user=#=postgres
+password=#=CGPA5.0class
+database=#=darleine_workflows
+port=#=5432
+auth_plugin=#=mysql_native_password
