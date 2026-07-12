@@ -16,7 +16,7 @@ class DDL:
 	def get_DDL(self):
 		DDLQueryList = []
 
-		DDLQueryList.append("CREATE DATABASE IF NOT EXISTS darleine_workflows;")
+		#DDLQueryList.append("CREATE DATABASE IF NOT EXISTS darleine_workflows;")
 
 		DDLQueryList.append("""
 		    CREATE TABLE IF NOT EXISTS workspace(
@@ -126,7 +126,7 @@ class DDL:
 				PRIMARY KEY(id),
 				CONSTRAINT FKEY_4_0 FOREIGN KEY(workflow_case_id) REFERENCES workflow_case(id) ON UPDATE CASCADE ON DELETE CASCADE,
 				CONSTRAINT FKEY_3_1 FOREIGN KEY(step_id) REFERENCES step(id) ON UPDATE CASCADE ON DELETE CASCADE,
-				CONSTRAINT FKEY_5_0 FOREIGN KEY(user_id) REFERENCES workspace_user(id) ON UPDATE CASCADE ON DELETE CASCADE,
+				CONSTRAINT FKEY_5_0 FOREIGN KEY(user_id) REFERENCES workspace_user(id) ON UPDATE CASCADE ON DELETE CASCADE
 		    );
 		""")
 
@@ -166,7 +166,7 @@ class DDL:
 				privilege_id VARCHAR(50) NOT NULL,
 				PRIMARY KEY(role_id, privilege_id),
 				CONSTRAINT FKEY_6_2 FOREIGN KEY(role_id) REFERENCES role(id) ON UPDATE CASCADE ON DELETE CASCADE,
-				CONSTRAINT FKEY_7_0 FOREIGN KEY(privilege_id) REFERENCES step(id) ON UPDATE CASCADE ON DELETE CASCADE,
+				CONSTRAINT FKEY_7_0 FOREIGN KEY(privilege_id) REFERENCES step(id) ON UPDATE CASCADE ON DELETE CASCADE
 			);
 		""")
 
@@ -184,7 +184,7 @@ class DDL:
 		    CREATE TABLE IF NOT EXISTS userstepmap(
 			    user_id VARCHAR(50) NOT NULL,
 				step_id VARCHAR(50) NOT NULL,
-				PRIMARY KEY(user_id, role_id),
+				PRIMARY KEY(user_id, step_id),
 				CONSTRAINT FKEY_5_1 FOREIGN KEY(user_id) REFERENCES workspace_user(id) ON UPDATE CASCADE ON DELETE CASCADE,
 				CONSTRAINT FKEY_3_3 FOREIGN KEY(step_id) REFERENCES step(id) ON UPDATE CASCADE ON DELETE CASCADE
 			);
@@ -194,7 +194,7 @@ class DDL:
 		    CREATE TABLE IF NOT EXISTS stepworkflow_casemap(
 			    step_id VARCHAR(50) NOT NULL,
 				workflow_case_id VARCHAR(50) NOT NULL,
-				PRIMARY KEY(step_id, role_id),
+				PRIMARY KEY(step_id, workflow_case_id),
 				CONSTRAINT FKEY_3_2 FOREIGN KEY(step_id) REFERENCES step(id) ON UPDATE CASCADE ON DELETE CASCADE,
 				CONSTRAINT FKEY_4_2 FOREIGN KEY(workflow_case_id) REFERENCES workflow_case(id) ON UPDATE CASCADE ON DELETE CASCADE
 			);
@@ -206,8 +206,9 @@ class DDL:
 
 
 	def generate_DDL(self):
-		connection = self.database_connection
-		connection_cursor = connection.cursor()
+		connection_cursor = self.database_connection.cursor()
 		DDLQueryList = self.get_DDL()
 		for i in range(0, len(DDLQueryList)):
 			connection_cursor.execute(DDLQueryList[i])
+			print(DDLQueryList[i])
+		self.database_connection.commit()

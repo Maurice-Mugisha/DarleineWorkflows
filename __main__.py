@@ -16,7 +16,7 @@ from datetime import datetime
 
 
 
-selection_object = Select("Umucyo selection object 1")
+selection_object = Select("Workflows selection object 1")
 
 # Client continent
 client_continent = "Africa"
@@ -40,5 +40,6 @@ database_connection_object = database_connection_facility.get_database_connectio
 
 query_executor = database_connection_object
 
-ddl_obj = DDL(query_executor)
+ddl_obj = DDL("Workflows Platform")
+ddl_obj.set_database_connection_object(query_executor)
 ddl_obj.generate_DDL()
