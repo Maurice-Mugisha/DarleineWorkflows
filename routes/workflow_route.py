@@ -1,0 +1,67 @@
+import os
+from fastapi import APIRouter
+
+from models.workflow import WorkflowModel
+from includes.utility_functions import *
+from includes.idgenerator import IDGenerator
+from includes.business_logic_functions import *
+
+
+router = APIRouter(prefix="/workflow", tags=["workflow"])
+
+
+@router.post("/register_a_workflow")
+async def register_a_workflow(workflowModel: WorkflowModel):
+    query_executor, insertion_object, selection_object, update_object, deletion_object = get_database_utility_tuple()
+    idgenerator_obj = IDGenerator("Africa", "Kigali")
+    workflow_id = idgenerator_obj.generate_workflow_id()
+    workspace_id = workflowModel.workspace_id
+    workflow_query = insertion_object.insert_workflow(workflow_id, workflowModel.name, workflowModel.description, workflowModel.is_mandatory, workflowModel.number_of_steps, workflowModel.status, workspace_id)
+
+    connection_cursor = query_executor.cursor()
+    connection_cursor.execute(workflow_query)
+    query_executor.commit()
+    query_executor.close()
+
+    return "Successuflly registered a workflow"
+
+
+@router.get("/retrieve_all_workflows", response_model = list[WorkflowModel])
+async def retrieve_all_workflows():
+    query_executor, insertion_object, selection_object, _, _ = get_database_utility_tuple()
+    workflow_list = get_workflows(selection_object, query_executor)
+    return workflow_list
+
+@router.get("/retrieve_a_workflow/{workflow_id}", response_model = WorkflowModel)
+async def retrieve_a_workflow(workflow_id):
+    query_executor, _, selection_object, _, _ = get_database_utility_tuple()
+    workflow_dictionary = get_specific_workflow(selection_object, query_executor, workflow_id)
+    return workflow_dictionary
+
+@router.get("/retrieve_workspace_workflows/{workspace_id}", response_model = list[WorkflowModel])
+async def retrieve_a_workflow(workspace_id):
+    query_executor, _, selection_object, _, _ = get_database_utility_tuple()
+    workflow_list = get_specific_workspace_workflows(selection_object, query_executor, workspace_id)
+    return workflow_list
+
+@router.post("/update_a_workflow", response_model = str)
+async def update_a_workflow(workflowModel: WorkflowModel):
+    query_executor, insertion_object, selection_object, update_object, deletion_object = get_database_utility_tuple()
+    workflow_query = update_object.update_workflow(workflowModel.id, workflowModel.name, workflowModel.description, workflowModel.is_mandatory, workflowModel.number_of_steps, workflowModel.status)
+    connection_cursor = query_executor.cursor()
+    connection_cursor.execute(workflow_query)
+    query_executor.commit()
+    query_executor.close()
+
+    return "successfully updated a workflow"
+
+@router.delete("/delete_a_workflow", response_model = str)
+async def delete_a_workflow(workflow_id: str):
+    query_executor, insertion_object, selection_object, update_object, deletion_object = get_database_utility_tuple()
+    workflow_query = deletion_object.delete_workflow(workflow_id)
+    connection_cursor = query_executor.cursor()
+    connection_cursor.execute(workflow_query)
+    query_executor.commit()
+    query_executor.close()
+
+    return "successfully deleted a workflow"

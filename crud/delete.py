@@ -15,7 +15,7 @@ class Delete:
 		return query
 
 	def delete_workspace(self, workspace_id):
-		query = f"DELETE FROM workspace WHERE workspace_id = '{workspace_id}';"
+		query = f"DELETE FROM workspace WHERE id = '{workspace_id}';"
 		return query
 
 
@@ -24,7 +24,7 @@ class Delete:
 		return query
 
 	def delete_role(self, role_id):
-		query = f"DELETE FROM role WHERE role_id = '{role_id}';"
+		query = f"DELETE FROM role WHERE id = '{role_id}';"
 		return query
 
 	def delete_from_privilege(self):
@@ -32,7 +32,7 @@ class Delete:
 		return query
 
 	def delete_privilege(self, privilege_id):
-		query = f"DELETE FROM privilege WHERE privilege_id = '{privilege_id}';"
+		query = f"DELETE FROM privilege WHERE id = '{privilege_id}';"
 		return query
 
 	def delete_from_user(self):
@@ -40,11 +40,11 @@ class Delete:
 		return query
 
 	def delete_user(self, user_id):
-		query = f"DELETE FROM user WHERE user_id = '{user_id}';"
+		query = f"DELETE FROM workspace_user WHERE id = '{user_id}';"
 		return query
 
 	def delete_user_by_workspace_id(self, workspace_id):
-		query = f"DELETE FROM user WHERE workspace_id = '{workspace_id}';"
+		query = f"DELETE FROM workspace_user WHERE workspace_id = '{workspace_id}';"
 		return query
 
 
@@ -53,7 +53,7 @@ class Delete:
 		return query
 
 	def delete_workflow(self, workflow_id):
-		query = f"DELETE FROM workflow WHERE workflow_id = '{workflow_id}';"
+		query = f"DELETE FROM workflow WHERE id = '{workflow_id}';"
 		return query
 
 	def delete_workflow_by_workspace_id(self, workspace_id):
@@ -65,7 +65,7 @@ class Delete:
 		return query
 
 	def delete_step(self, step_id):
-		query = f"DELETE FROM step WHERE step_id = '{step_id}';"
+		query = f"DELETE FROM step WHERE id = '{step_id}';"
 		return query
 
 	def delete_step_by_workflow_id(self, workflow_id):
@@ -77,7 +77,7 @@ class Delete:
 		return query
 
 	def delete_time(self, time_id):
-		query = f"DELETE FROM time WHERE time_id = '{time_id}';"
+		query = f"DELETE FROM time WHERE id = '{time_id}';"
 		return query
 
 	def delete_time_by_step_id(self, step_id):
@@ -89,7 +89,7 @@ class Delete:
 		return query
 
 	def delete_workflow_case(self, workflow_case_id):
-		query = f"DELETE FROM workflow_case WHERE workflow_case_id = '{workflow_case_id}';"
+		query = f"DELETE FROM workflow_case WHERE id = '{workflow_case_id}';"
 		return query
 
 	def delete_from_report(self):
@@ -97,7 +97,7 @@ class Delete:
 		return query
 
 	def delete_report(self, report_id):
-		query = f"DELETE FROM report WHERE report_id = '{report_id}';"
+		query = f"DELETE FROM report WHERE id = '{report_id}';"
 		return query
 
 	def delete_report_by_step_user_and_workflow_case(self, step_id, user_id, workflow_case_id):

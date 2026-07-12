@@ -56,7 +56,7 @@ class Update:
 		           UPDATE
 				       workspace_user
 				   SET
-				       first_name = '{name}',
+				       first_name = '{first_name}',
 					   last_name = '{last_name}',
 					   job_title = '{job_title}',
 					   email = '{email}',

@@ -19,7 +19,7 @@ class Insert:
 		return query
 
 	def insert_user(self, id, first_name, last_name, job_title, email, password, workspace_id):
-		query = f"INSERT INTO user VALUES('{id}', '{first_name}', '{last_name}', '{job_title}', '{email}', '{password}', '{workflow_id}');"
+		query = f"INSERT INTO workspace_user VALUES('{id}', '{first_name}', '{last_name}', '{job_title}', '{email}', '{password}', '{workspace_id}');"
 		return query
 
 	def insert_role(self, id, name, description):
@@ -35,7 +35,7 @@ class Insert:
 		return query
 
 	def insert_time(self, id, time_unit, time_unit_category, time_unit_value, step_id):
-		query = f"INSERT INTO time VALUES('{id}', '{time_unit}', '{time_unit_category}', {time_unit_value}, {step_id});"
+		query = f"INSERT INTO time VALUES('{id}', '{time_unit}', '{time_unit_category}', {time_unit_value}, '{step_id}');"
 		return query
 
 	def insert_workflow_case(self, id, legacy_id, name, description):

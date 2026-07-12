@@ -1,14 +1,15 @@
-
+import psycopg2
+import psycopg2.extras
 
 
 def get_workspaces(selection_obj, query_executor):
 
 	workspace_dictionary = {}
-	cursor = query_executor.cursor(dictionary=True)
+	cursor = query_executor.cursor()
 	cursor.execute(selection_obj.select_from_workspace())
-	for row in cursor:
-		workspace_id = row['id']
-		workspace_dictionary[workspace_id] = get_specific_workspace(selection_obj, query_executor, workspace_id)
+	workspace_dictionary = cursor.fetchall()
+	cursor.close()
+	query_executor.close()
 	return workspace_dictionary
 
 
@@ -36,54 +37,46 @@ def get_privileges(selection_obj, query_executor):
 
 def get_users(selection_obj, query_executor):
 
-	user_dictionary = {}
-	cursor = query_executor.cursor(dictionary=True)
+	user_list = []
+	cursor = query_executor.cursor()
 	cursor.execute(selection_obj.select_from_user())
-	for row in cursor:
-		user_id = row['id']
-		workspace_id = row['workspace_id']
-		key = user_id + "__" + workspace_id
-		user_dictionary[key] = get_specific_user(selection_obj, query_executor, user_id, workspace_id)
-	return user_dictionary
+	user_list = cursor.fetchall()
+	cursor.close()
+	query_executor.close()
+	return user_list
 
 
 def get_workflows(selection_obj, query_executor):
 
-	workflow_dictionary = {}
-	cursor = query_executor.cursor(dictionary=True)
+	workflow_list = []
+	cursor = query_executor.cursor()
 	cursor.execute(selection_obj.select_from_workflow())
-	for row in cursor:
-		workflow_id = row['id']
-		workspace_id = row['workspace_id']
-		key = workflow_id + "__" + workspace_id
-		workflow_dictionary[key] = get_specific_workflow(selection_obj, query_executor, workflow_id, workspace_id)
-	return workflow_dictionary
+	workflow_list = cursor.fetchall()
+	cursor.close()
+	query_executor.close()
+	return workflow_list
 
 
 def get_steps(selection_obj, query_executor):
 
-	step_dictionary = {}
-	cursor = query_executor.cursor(dictionary=True)
+	step_list = []
+	cursor = query_executor.cursor()
 	cursor.execute(selection_obj.select_from_step())
-	for row in cursor:
-		step_id = row['id']
-		workflow_id = row['workflow_id']
-		key = step_id + "__" + workflow_id
-		step_dictionary[key] = get_specific_step(selection_obj, query_executor, step_id, workflow_id)
-	return step_dictionary
+	step_list = cursor.fetchall()
+	cursor.close()
+	query_executor.close()
+	return step_list
 
 
 def get_times(selection_obj, query_executor):
 
-	time_dictionary = {}
-	cursor = query_executor.cursor(dictionary=True)
+	time_list = []
+	cursor = query_executor.cursor()
 	cursor.execute(selection_obj.select_from_time())
-	for row in cursor:
-		time_id = row['id']
-		step_id = row['step_id']
-		key = time_id + "__" + step_id
-		time_dictionary[key] = get_specific_time(selection_obj, query_executor, time_id, step_id)
-	return time_dictionary
+	time_list = cursor.fetchall()
+	cursor.close()
+	query_executor.close()
+	return time_list
 
 
 def get_workflow_cases(selection_obj, query_executor):
@@ -209,9 +202,11 @@ def get_specific_workspace(selection_obj, query_executor, workspace_id):
 
 	workspace_dictionary = {}
 
-	cursor = query_executor.cursor(dictionary=True)
-	cursor = query_executor.execute(selection_obj.select_workspace(workspace_id))
+	cursor = query_executor.cursor()
+	cursor.execute(selection_obj.select_workspace(workspace_id))
 	workspace_dictionary = cursor.fetchone()
+	cursor.close()
+	query_executor.close()
 	return workspace_dictionary
 
 
@@ -221,7 +216,7 @@ def get_specific_role(selection_obj, query_executor, role_id):
 	role_dictionary = {}
 
 	cursor = query_executor.cursor(dictionary=True)
-	cursor = query_executor.execute(selection_obj.select_role(role_id))
+	cursor.execute(selection_obj.select_role(role_id))
 	role_dictionary = cursor.fetchone()
 
 	return role_dictionary
@@ -240,51 +235,71 @@ def get_specific_privilege(selection_obj, query_executor, privilege_id):
 
 
 
-def get_specific_user(selection_obj, query_executor, user_id, workspace_id): #todo: perhaps remove the workspace ID, since the user is already unique by nature
+def get_specific_user(selection_obj, query_executor, user_id):
 
 	user_dictionary = {}
-
-	cursor = query_executor.cursor(dictionary=True)
-	cursor = query_executor.execute(selection_obj.select_user(user_id))
+	cursor = query_executor.cursor()
+	cursor.execute(selection_obj.select_user(user_id))
 	user_dictionary = cursor.fetchone()
-
+	cursor.close()
+	query_executor.close()
 	return user_dictionary
 
 
 
-def get_specific_workflow(selection_obj, query_executor, workflow_id, workspace_id):
+def get_specific_workflow(selection_obj, query_executor, workflow_id):
 
 	workflow_dictionary = {}
-
-	cursor = query_executor.cursor(dictionary=True)
-	cursor = query_executor.execute(selection_obj.select_workflow_name(workflow_id))
+	cursor = query_executor.cursor()
+	cursor.execute(selection_obj.select_workflow(workflow_id))
 	workflow_dictionary = cursor.fetchone()
-
 	return workflow_dictionary
 
 
+def get_specific_workspace_workflows(selection_obj, query_executor, workspace_id):
 
-def get_specific_step(selection_obj, query_executor, step_id, workflow_id):
+	workflow_list = []
+	cursor = query_executor.cursor()
+	cursor.execute(selection_obj.select_workflow_by_workspace_id(workspace_id))
+	workflow_list = cursor.fetchall()
+	return workflow_list
+
+
+
+def get_specific_step(selection_obj, query_executor, step_id):
 
 	step_dictionary = {}
-
-	cursor = query_executor.cursor(dictionary=True)
-	cursor = query_executor.execute(selection_obj.select_step_name(step_id))
+	cursor = query_executor.cursor()
+	cursor.execute(selection_obj.select_step(step_id))
 	step_dictionary = cursor.fetchone()
-
 	return step_dictionary
 
+def get_workflow_steps(selection_obj, query_executor, workflow_id):
+
+	step_list = []
+	cursor = query_executor.cursor()
+	cursor.execute(selection_obj.select_step_by_workflow_id(workflow_id))
+	step_list = cursor.fetchall()
+	return step_list
 
 
-def get_specific_time(selection_obj, query_executor, time_id, step_id):
+
+def get_specific_time(selection_obj, query_executor, time_id):
 
 	time_dictionary = {}
-
-	cursor = query_executor.cursor(dictionary=True)
-	cursor = query_executor.execute(selection_obj.select_time_time_unit(time_id))
+	cursor = query_executor.cursor()
+	cursor.execute(selection_obj.select_time(time_id))
 	time_dictionary = cursor.fetchone()
-
 	return time_dictionary
+
+
+def get_step_times(selection_obj, query_executor, step_id):
+
+	time_list = []
+	cursor = query_executor.cursor()
+	cursor.execute(selection_obj.select_time_by_step_id(step_id))
+	time_list = cursor.fetchall()
+	return time_list
 
 
 
@@ -315,7 +330,7 @@ def get_specific_report(selection_obj, query_executor, report_id, step_id, user_
 def get_specific_workspacerolemap(selection_obj, query_executor, key_column, workspace_id, role_id):
 
 	workspacerolemap_dictionary = {}
-	cursor = query_executor.cursor(dictionary=True)
+	cursor = query_executor.cursor()
 	cursor = query_executor.execute(selection_obj.select_workspacerolemap(key_column, workspace_id, role_id))
 	workspacerolemap_dictionary = cursor.fetchone()
 

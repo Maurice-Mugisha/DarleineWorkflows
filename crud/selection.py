@@ -15,7 +15,7 @@ class Select:
 		return query
 
 	def select_workspace(self, workspace_id):
-		query = f"SELECT * FROM workspace WHERE workspace_id = '{workspace_id}';"
+		query = f"SELECT * FROM workspace WHERE id = '{workspace_id}';"
 		return query
 
 	def select_count_from_workspace(self):
@@ -27,7 +27,7 @@ class Select:
 		return query
 
 	def select_role(self, role_id):
-		query = f"SELECT * FROM role WHERE role_id = '{role_id}';"
+		query = f"SELECT * FROM role WHERE id = '{role_id}';"
 		return query
 
 	def select_count_from_role(self):
@@ -39,7 +39,7 @@ class Select:
 		return query
 
 	def select_privilege(self, privilege_id):
-		query = f"SELECT * FROM privilege WHERE privilege_id = '{privilege_id}';"
+		query = f"SELECT * FROM privilege WHERE id = '{privilege_id}';"
 		return query
 
 	def select_count_from_privilege(self):
@@ -47,19 +47,19 @@ class Select:
 		return query
 
 	def select_from_user(self):
-		query = "SELECT * FROM user;"
+		query = "SELECT * FROM workspace_user;"
 		return query
 
 	def select_user(self, user_id):
-		query = f"SELECT * FROM user WHERE user_id = '{user_id}';"
+		query = f"SELECT * FROM workspace_user WHERE id = '{user_id}';"
 		return query
 
 	def select_count_from_user(self):
-		query = "SELECT COUNT(*) AS count FROM user;"
+		query = "SELECT COUNT(*) AS count FROM workspace_user;"
 		return query
 
 	def select_user_by_workspace_id(self, workspace_id):
-		query = f"SELECT * FROM user WHERE workspace_id = '{workspace_id}';"
+		query = f"SELECT * FROM workspace_user WHERE id = '{workspace_id}';"
 		return query
 
 	def select_from_workflow(self):
@@ -67,7 +67,7 @@ class Select:
 		return query
 
 	def select_workflow(self, workflow_id):
-		query = f"SELECT * FROM workflow WHERE workflow_id = '{workflow_id}';"
+		query = f"SELECT * FROM workflow WHERE id = '{workflow_id}';"
 		return query
 
 	def select_count_from_workflow(self):
@@ -83,7 +83,7 @@ class Select:
 		return query
 
 	def select_step(self, step_id):
-		query = f"SELECT * FROM step WHERE step_id = '{step_id}';"
+		query = f"SELECT * FROM step WHERE id = '{step_id}';"
 		return query
 
 	def select_count_from_step(self):
@@ -99,7 +99,7 @@ class Select:
 		return query
 
 	def select_time(self, time_id):
-		query = f"SELECT * FROM time WHERE time_id = '{time_id}';"
+		query = f"SELECT * FROM time WHERE id = '{time_id}';"
 		return query
 
 	def select_count_from_time(self):

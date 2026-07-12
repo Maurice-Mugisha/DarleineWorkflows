@@ -16,8 +16,6 @@ class DDL:
 	def get_DDL(self):
 		DDLQueryList = []
 
-		#DDLQueryList.append("CREATE DATABASE IF NOT EXISTS darleine_workflows;")
-
 		DDLQueryList.append("""
 		    CREATE TABLE IF NOT EXISTS workspace(
 		        id VARCHAR(50) NOT NULL,
@@ -210,5 +208,6 @@ class DDL:
 		DDLQueryList = self.get_DDL()
 		for i in range(0, len(DDLQueryList)):
 			connection_cursor.execute(DDLQueryList[i])
-			print(DDLQueryList[i])
+		print("Successfully initialized/updated the database relational/physical schema")
 		self.database_connection.commit()
+		self.database_connection.close()
