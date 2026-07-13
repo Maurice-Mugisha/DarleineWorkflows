@@ -1,10 +1,13 @@
 import os
 from fastapi import APIRouter
 
+import json
+
 from models.time import TimeModel
 from includes.utility_functions import *
 from includes.idgenerator import IDGenerator
 from includes.business_logic_functions import *
+from models.time_unit import TimeUnitModel
 
 
 router = APIRouter(prefix="/time", tags=["time"])
@@ -22,6 +25,16 @@ async def register_a_time(timeModel: TimeModel):
     query_executor.close()
 
     return "Successuflly registered a time"
+
+@router.get("/retrieve_all_time_units", response_model = list[str])
+async def retrieve_all_time_units():
+    time_unit_name_list = []
+    with open("data/time_unit.json") as file:
+        time_unit_list = json.load(file)
+        for time_unit in time_unit_list:
+            time_unit_name_list.append(time_unit["name"])
+
+    return time_unit_name_list
 
 
 @router.get("/retrieve_all_times", response_model = list[TimeModel])

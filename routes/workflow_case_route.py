@@ -7,7 +7,7 @@ from includes.idgenerator import IDGenerator
 from includes.business_logic_functions import *
 
 
-router = APIRouter(prefix="/workflow_case", tags=["workflow_case"])
+router = APIRouter(prefix="/workflow_case", tags=["workflow case"])
 
 
 @router.post("/register_a_workflow_case")
@@ -16,9 +16,29 @@ async def register_a_workflow_case(workflowCaseModel: WorkflowCaseModel):
     idgenerator_obj = IDGenerator("Africa", "Kigali")
     workflow_case_id = idgenerator_obj.generate_workflow_case_id()
     workflow_case_query = insertion_object.insert_workflow_case(workflow_case_id, workflowCaseModel.legacy_id, workflowCaseModel.name, workflowCaseModel.description)
-    
+    workflow_id_list = workflowCaseModel.workflow_id_list
+
+    step_id_list = []
+    if workflow_id_list and len(workflow_id_list) > 0:
+        for workflow_id in workflow_id_list:
+            step_list = get_workflow_steps(selection_object, query_executor, workflow_id)
+            if step_list and len(step_list) > 0:
+                for step in step_list:
+                    step_id_list.append(step["id"])
+
     connection_cursor = query_executor.cursor()
     connection_cursor.execute(workflow_case_query)
+
+    if workflow_id_list and len(workflow_id_list) > 0:
+        for workflow_id in workflow_id_list:
+            worflow_workflow_case_map_query = insertion_object.insert_workflowworkflow_casemap(workflow_id, workflow_case_id)
+            connection_cursor.execute(worflow_workflow_case_map_query)
+
+    if step_id_list and len(step_id_list) > 0:
+        for step_id in step_id_list:
+            step_workflow_case_map_query = insertion_object.insert_stepworkflow_casemap(step_id, workflow_case_id)
+            connection_cursor.execute(step_workflow_case_map_query)
+
     query_executor.commit()
     query_executor.close()
 
@@ -46,7 +66,7 @@ async def update_a_workflow_case(workflowCaseModel: WorkflowCaseModel):
     query_executor.commit()
     query_executor.close()
 
-    return "successfully updated a workflow_case"
+    return "successfully updated a workflow case"
 
 @router.delete("/delete_a_workflow_case", response_model = str)
 async def delete_a_workflow_case(workflow_case_id: str):
@@ -57,4 +77,4 @@ async def delete_a_workflow_case(workflow_case_id: str):
     query_executor.commit()
     query_executor.close()
 
-    return "successfully deleted a workflow_case"
+    return "successfully deleted a workflow case"

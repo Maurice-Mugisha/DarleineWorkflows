@@ -20,9 +20,18 @@ async def register_a_workspace(workspaceModel: WorkspaceModel):
     user_id = idgenerator_obj.generate_user_id()
     user_query = insertion_object.insert_user(user_id, admin.first_name, admin.last_name, admin.job_title, admin.email, admin.password, workspace_id)
 
+    role_query = selection_object.select_role_by_name("Workspace admin")
+    connection_cursor = query_executor.cursor()
+    connection_cursor.execute(role_query)
+    role_dictionary = connection_cursor.fetchone()
+    role_model = RoleModel(**role_dictionary)
+    role_id = role_model.id
+    user_role_map_query = insertion_object.insert_userrolemap(user_id, role_id)
+
     connection_cursor = query_executor.cursor()
     connection_cursor.execute(workspace_query)
     connection_cursor.execute(user_query)
+    connection_cursor.execute(user_role_map_query)
     query_executor.commit()
     query_executor.close()
 

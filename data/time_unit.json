@@ -1,0 +1,42 @@
+[
+  {
+    "name": "second",
+    "description": "The base unit of time in the International System of Units (SI)."
+  },
+  {
+    "name": "minute",
+    "description": "A unit of time equal to 60 seconds."
+  },
+  {
+    "name": "hour",
+    "description": "A unit of time equal to 60 minutes or 3,600 seconds."
+  },
+  {
+    "name": "day",
+    "description": "A unit of time equal to 24 hours, representing one full rotation of the Earth."
+  },
+  {
+    "name": "week",
+    "description": "A unit of time equal to 7 days."
+  },
+  {
+    "name": "month",
+    "description": "A calendar-based unit of time, typically ranging from 28 to 31 days."
+  },
+  {
+    "name": "quarter",
+    "description": "A period of three months, often used in business and financial reporting."
+  },
+  {
+    "name": "year",
+    "description": "A unit of time equal to approximately 365.25 days, representing one orbit of the Earth around the Sun."
+  },
+  {
+    "name": "decade",
+    "description": "A period of 10 years."
+  },
+  {
+    "name": "century",
+    "description": "A period of 100 years."
+  }
+]

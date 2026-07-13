@@ -1,4 +1,5 @@
 from dataclasses import dataclass, asdict
+from models.time import TimeModel
 
 @dataclass
 class StepModel:
@@ -11,3 +12,5 @@ class StepModel:
     percentage: float
     warning_threshold: float
     code: str
+    role_id_list: list[str] | None = None
+    time_list: list[TimeModel] | None = None

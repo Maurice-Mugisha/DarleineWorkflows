@@ -1,0 +1,22 @@
+[
+  {
+    "id": "1",
+    "name": "Super admin",
+    "description": "The admin that has complete oversight over all the worspaces."
+  },
+  {
+    "id": "2",
+    "name": "Workspace admin",
+    "description": "A user that has got oversight over a specific workspace."
+  },
+  {
+    "id": "3",
+    "name": "All Workflow steps user",
+    "description": "A user who can execute all workflow steps."
+  },
+  {
+    "id": "4",
+    "name": "Workflow step user",
+    "description": "A user that can execute specific workflow steps"
+  }
+]

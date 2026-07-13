@@ -30,6 +30,10 @@ class Select:
 		query = f"SELECT * FROM role WHERE id = '{role_id}';"
 		return query
 
+	def select_role_by_name(self, name):
+		query = f"SELECT * FROM role WHERE name = '{name}' LIMIT 1;"
+		return query
+
 	def select_count_from_role(self):
 		query = "SELECT COUNT(*) AS count FROM role;"
 		return query
@@ -59,7 +63,11 @@ class Select:
 		return query
 
 	def select_user_by_workspace_id(self, workspace_id):
-		query = f"SELECT * FROM workspace_user WHERE id = '{workspace_id}';"
+		query = f"SELECT * FROM workspace_user WHERE workspace_id = '{workspace_id}';"
+		return query
+
+	def select_user_by_email(self, email):
+		query = f"SELECT * FROM workspace_user WHERE email = '{email}';"
 		return query
 
 	def select_from_workflow(self):

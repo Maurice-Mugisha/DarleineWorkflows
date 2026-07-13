@@ -1,7 +1,8 @@
 from dataclasses import dataclass, asdict
+from models.role import RoleModel
 
 @dataclass
-class UserModel:
+class AuthenticatedUserModel:
     id: str
     workspace_id: str
     first_name: str
@@ -9,4 +10,4 @@ class UserModel:
     email: str
     password: str
     job_title: str
-    role_id: str | None = None 
+    roles: list[RoleModel] | None = None

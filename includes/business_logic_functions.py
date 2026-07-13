@@ -15,24 +15,24 @@ def get_workspaces(selection_obj, query_executor):
 
 def get_roles(selection_obj, query_executor):
 
-	role_dictionary = {}
-	cursor = query_executor.cursor(dictionary=True)
+	role_list = []
+	cursor = query_executor.cursor()
 	cursor.execute(selection_obj.select_from_role())
-	for row in cursor:
-		role_id = row['id']
-		role_dictionary[role_id] = get_specific_role(selection_obj, query_executor, role_id)
-	return role_dictionary
+	role_list = cursor.fetchall()
+	cursor.close()
+	query_executor.close()
+	return role_list
 
 
 def get_privileges(selection_obj, query_executor):
 
-	privilege_dictionary = {}
-	cursor = query_executor.cursor(dictionary=True)
+	privilege_list = []
+	cursor = query_executor.cursor()
 	cursor.execute(selection_obj.select_from_privilege())
-	for row in cursor:
-		privilege_id = row['id']
-		privilege_dictionary[privilege_id] = get_specific_privilege(selection_obj, query_executor, privilege_id)
-	return privilege_dictionary
+	privilege_list = cursor.fetchall()
+	cursor.close()
+	query_executor.close()
+	return privilege_list
 
 
 def get_users(selection_obj, query_executor):
@@ -82,7 +82,7 @@ def get_times(selection_obj, query_executor):
 def get_workflow_cases(selection_obj, query_executor):
 
 	workflow_case_dictionary = {}
-	cursor = query_executor.cursor(dictionary=True)
+	cursor = query_executor.cursor()
 	cursor.execute(selection_obj.select_from_workflow_case())
 	for row in cursor:
 		workflow_case_id = row['id']
@@ -214,11 +214,11 @@ def get_specific_workspace(selection_obj, query_executor, workspace_id):
 def get_specific_role(selection_obj, query_executor, role_id):
 
 	role_dictionary = {}
-
-	cursor = query_executor.cursor(dictionary=True)
+	cursor = query_executor.cursor()
 	cursor.execute(selection_obj.select_role(role_id))
 	role_dictionary = cursor.fetchone()
-
+	cursor.close()
+	query_executor.close()
 	return role_dictionary
 
 
@@ -246,6 +246,28 @@ def get_specific_user(selection_obj, query_executor, user_id):
 	return user_dictionary
 
 
+def get_specific_workspace_users(selection_obj, query_executor, workspace_id):
+
+	user_list = []
+	cursor = query_executor.cursor()
+	cursor.execute(selection_obj.select_user_by_workspace_id(workspace_id))
+	user_list = cursor.fetchall()
+	cursor.close()
+	query_executor.close()
+	return user_list
+
+
+def get_specific_user_by_email(selection_obj, query_executor, email):
+
+	user_dictionary = {}
+	cursor = query_executor.cursor()
+	cursor.execute(selection_obj.select_user_by_email(email))
+	user_dictionary = cursor.fetchone()
+	cursor.close()
+	query_executor.close()
+	return user_dictionary
+
+
 
 def get_specific_workflow(selection_obj, query_executor, workflow_id):
 
@@ -253,6 +275,8 @@ def get_specific_workflow(selection_obj, query_executor, workflow_id):
 	cursor = query_executor.cursor()
 	cursor.execute(selection_obj.select_workflow(workflow_id))
 	workflow_dictionary = cursor.fetchone()
+	cursor.close()
+	query_executor.close()
 	return workflow_dictionary
 
 
@@ -300,6 +324,23 @@ def get_step_times(selection_obj, query_executor, step_id):
 	cursor.execute(selection_obj.select_time_by_step_id(step_id))
 	time_list = cursor.fetchall()
 	return time_list
+
+
+def get_step_roles(selection_obj, query_executor, step_id):
+
+	role_list = []
+	steprolemap_list = []
+	cursor = query_executor.cursor()
+	cursor.execute(selection_obj.select_steprolemap_by_role(step_id))
+	steprolemap_list = cursor.fetchall()
+
+	if steprolemap_list and len(steprolemap):
+		for steprolemap in steprolemap_list:
+			role_id = steprolemap["role_id"]
+			role_dictionary = get_specific_role(selection_obj, query_executor, role_id)
+			if role_dictionary:
+				role_list.append(role_dictionary)
+	return role_list
 
 
 
@@ -382,13 +423,14 @@ def get_specific_roleprivilegemap(selection_obj, query_executor, key_column, rol
 
 
 
-def get_specific_userrolemap(selection_obj, query_executor, key_column, user_id, role_id):
+def get_specific_userrolemap(selection_obj, query_executor, user_id, role_id):
 
 	userrolemap_dictionary = {}
 	cursor = query_executor.cursor(dictionary=True)
-	cursor = query_executor.execute(selection_obj.select_userrolemap(key_column, user_id, role_id))
+	cursor.execute(selection_obj.select_userrolemap(user_id, role_id))
 	userrolemap_dictionary = cursor.fetchone()
-
+	cursor.close()
+	query_executor.close()
 	return userrolemap_dictionary
 
 
@@ -486,17 +528,22 @@ def get_specific_privilege_roles(selection_obj, query_executor, privilege_id):
 
 
 
-def get_specific_user_roles(selection_obj, query_executor, user_id, workspace_id):
+def get_specific_user_roles(selection_obj, query_executor, user_id):
 
-	role_dictionary = {}
-
-	cursor = query_executor.cursor(dictionary=True)
+	user_role_map_list = {}
+	cursor = query_executor.cursor()
 	cursor.execute(selection_obj.select_userrolemap_by_user(user_id))
-	for row in cursor:
-		role_id = row['role_id']
-		role_dictionary[role_id] = get_specific_role(selection_obj, query_executor, role_id)
+	user_role_map_list = cursor.fetchall()
+	role_list = []
 
-	return role_dictionary
+	for row in user_role_map_list:
+		role_id = row['role_id']
+		role_dictionary = get_specific_role(selection_obj, query_executor, role_id)
+		role_list.append(role_dictionary)
+
+	cursor.close()
+	query_executor.close()
+	return role_list
 
 
 def get_specific_user_steps(selection_obj, query_executor, user_id, workspace_id):
@@ -684,7 +731,7 @@ def get_user_roles_map(query_executor, selection_obj, user_dictionary):
 	for user in user_dictionary:
 		user_id = user_dictionary[user]
 		workspace_id = user_dictionary[user]
-		role_dictionary = get_specific_user_roles(selection_obj, query_executor, user_id, workspace_id)
+		role_dictionary = get_specific_user_roles(selection_obj, query_executor, user_id)
 		userrolemap_dictionary[user] = role_dictionary
 
 	return userrolemap_dictionary
