@@ -1,6 +1,8 @@
 import os
 from fastapi import APIRouter, HTTPException
 
+from dataclasses import asdict
+
 from models.step import StepModel
 from models.time import TimeModel
 from includes.utility_functions import *
@@ -82,23 +84,26 @@ async def retrieve_workflow_steps(workflow_id):
     if step_list and len(step_list) > 0:
         step_id_list = [step_dictionary["id"] for step_dictionary in step_list]
 
+    i = 0
     for step_id in step_id_list:
 
         query_executor, _, selection_object, _, _ = get_database_utility_tuple()
         time_list = get_step_times(selection_object, query_executor, step_id)
         time_model_list = []
         if time_list and len(time_list) > 0:
-            time_model_list = [asdict(time_dictionary) for time_dictionary in time_list]
+            time_model_list = [TimeModel(**time_dictionary) for time_dictionary in time_list]
+        step_dictionary = step_list[i]
         stepModel = StepModel(**step_dictionary)
         stepModel.time_list = time_model_list
 
         query_executor, _, selection_object, _, _ = get_database_utility_tuple()
-        role_list = get_step_roles(selection_obj, query_executor, step_id)
+        role_list = get_step_roles(selection_object, query_executor, step_id)
         role_id_list = []
         if role_list and len(role_list):
             role_id_list = [role_dictionary["id"] for role_dictionary in role_list]
         stepModel.role_id_list = role_id_list
         step_model_list.append(stepModel)
+        i = i + 1
 
     return step_model_list
 

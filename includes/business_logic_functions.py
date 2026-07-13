@@ -587,62 +587,33 @@ def get_specific_step_roles(selection_obj, query_executor, step_id, workflow_id)
 
 	return role_dictionary
 
+def get_specific_workflow_case_reports(selection_obj, query_executor, workflow_case_id):
 
-def get_specific_step_workflow_cases(selection_obj, query_executor, step_id, workflow_id):
-
-	workflow_case_dictionary = {}
-
-	cursor = query_executor.cursor(dictionary=True)
-	cursor.execute(selection_obj.select_stepworkflow_casemap_by_step(step_id))
-	for row in cursor:
-		workflow_case_id = row['workflow_case_id']
-		workflow_case_dictionary[workflow_case_id] = get_specific_workflow_case(selection_obj, query_executor, workflow_case_id)
-
-	return workflow_case_dictionary
-
-
-def get_specific_step_users(selection_obj, query_executor, step_id, workflow_id):
-
-	user_dictionary = {}
-
-	cursor = query_executor.cursor(dictionary=True)
-	cursor.execute(selection_obj.select_userstepmap_by_step(step_id))
-	for row in cursor:
-		user_id = row['user_id']
-		workspace_id = row['workspace_id']
-		user_dictionary[user_id, workspace_id] = get_specific_user(selection_obj, query_executor, user_id, workspace_id)
-
-	return user_dictionary
-
-
-
-
-def get_specific_workflow_case_workflows(selection_obj, query_executor, workflow_case_id):
-
-	workflow_dictionary = {}
-
-	cursor = query_executor.cursor(dictionary=True)
-	cursor.execute(selection_obj.select_workflowworkflow_casemap_by_workflow_case(workflow_case_id))
-	for row in cursor:
-		workflow_id = row['workflow_id']
-		workspace_id = row['workspace_id']
-		workflow_dictionary[workflow_id, workspace_id] = get_specific_workflow(selection_obj, query_executor, workflow_id, workspace_id)
-
-	return workflow_dictionary
+	report_list = []
+	cursor = query_executor.cursor()
+	cursor.execute(selection_obj.select_report_by_workflow_case_id(workflow_case_id))
+	report_list = cursor.fetchall()
+	cursor.close()
+	query_executor.close()
+	return report_list
 
 
 def get_specific_workflow_case_steps(selection_obj, query_executor, workflow_case_id):
 
-	step_dictionary = {}
-
-	cursor = query_executor.cursor(dictionary=True)
+	step_list = []
+	stepworkflow_casemap_list = []
+	cursor = query_executor.cursor()
 	cursor.execute(selection_obj.select_stepworkflow_casemap_by_workflow_case(workflow_case_id))
-	for row in cursor:
+	stepworkflow_casemap_list = cursor.fetchall()
+	
+	for row in stepworkflow_casemap_list:
 		step_id = row['step_id']
-		workflow_id = row['workflow_id']
-		step_dictionary[step_id, workflow_id] = get_specific_step(selection_obj, query_executor, step_id, workflow_id)
+		step_dictionary= cursor.execute(selection_obj.select_step(step_id))
+		step_list.append(step_dictionary)
+	cursor.close()
+	query_executor.close()
 
-	return step_dictionary
+	return step_list
 
 
 

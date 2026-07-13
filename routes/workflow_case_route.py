@@ -55,7 +55,17 @@ async def retrieve_all_workflow_cases():
 async def retrieve_a_workflow_case(workflow_case_id):
     query_executor, _, selection_object, _, _ = get_database_utility_tuple()
     workflow_case_dictionary = get_specific_workflow_case(selection_object, query_executor, workflow_case_id)
-    return workflow_case_dictionary
+    if workflow_case_dictionary:
+        workflow_case_model = WorkflowCaseModel(**workflow_case_dictionary)
+        query_executor, _, selection_object, _, _ = get_database_utility_tuple()
+        step_list = get_specific_workflow_case_steps(selection_obj, query_executor, workflow_case_id)
+        step_model_list = []
+        if step_list and len(step_list) > 0:
+            step_model_list = [StepModel(**step_dictionary) for step_dictionary in step_list]
+        workflow_case_model.step_list = step_model_list
+        # add the workflow id list 
+        return workflow_case_model
+    return {}
 
 @router.post("/update_a_workflow_case", response_model = str)
 async def update_a_workflow_case(workflowCaseModel: WorkflowCaseModel):

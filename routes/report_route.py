@@ -38,11 +38,14 @@ async def retrieve_a_report(report_id):
     report_dictionary = get_specific_report(selection_object, query_executor, report_id)
     return report_dictionary
 
-@router.get("/retrieve_step_reports/{step_id}", response_model = list[ReportModel])
-async def retrieve_a_report(step_id):
+@router.get("/retrieve_workflow_case_reports/{workflow_case_id}", response_model = list[ReportModel])
+async def retrieve_step_reports(workflow_case_id):
     query_executor, _, selection_object, _, _ = get_database_utility_tuple()
-    report_list = get_specific_step_reports(selection_object, query_executor, step_id)
-    return report_list
+    report_list = get_specific_workflow_case_reports(selection_obj, query_executor, workflow_case_id)
+    report_model_list = []
+    if report_list and len(report_list) > 0:
+        report_model_list = [ReportModel(**report_dictionary) for report_dictionary in report_list]
+    return report_model_list
 
 @router.post("/update_a_report", response_model = str)
 async def update_a_report(reportModel: ReportModel):
