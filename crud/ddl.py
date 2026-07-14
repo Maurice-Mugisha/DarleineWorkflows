@@ -118,6 +118,7 @@ class DDL:
 		        id VARCHAR(50) NOT NULL,
 				report_text TEXT,
 				optional_document_url TEXT,
+				submission_time_stamp VARCHAR(30) NOT NULL,
 				workflow_case_id VARCHAR(50) NOT NULL,
 				step_id VARCHAR(50) NOT NULL,
 				user_id VARCHAR(50) NOT NULL,

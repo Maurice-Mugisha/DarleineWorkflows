@@ -1,11 +1,13 @@
 import os
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from dataclasses import asdict
 
 from models.user import UserModel
+from models.login import LoginModel
 from includes.utility_functions import *
 from includes.idgenerator import IDGenerator
 from includes.business_logic_functions import *
+from includes.utility_functions import *
 
 
 router = APIRouter(prefix="/user", tags=["user"])
@@ -52,10 +54,14 @@ async def register_a_user(userModel: UserModel):
 
 
 @router.get("/retrieve_all_users", response_model = list[UserModel])
-async def retrieve_all_users():
+async def retrieve_all_users(loginModel: LoginModel = Depends(get_currently_logged_user_info)):
+    authenticatedUserModel, role_list = get_specific_authenticated_user_by_email(loginModel.email)
+    workspace_id = authenticatedUserModel.workspace_id
     query_executor, insertion_object, selection_object, _, _ = get_database_utility_tuple()
-    user_list = get_users(selection_object, query_executor)
-    return user_list
+    user_list = get_specific_workspace_users(query_executor, selection_object, workspace_id)
+    user_model_list = [UserModel(**user_dictionary) for user_dictionary in user_list if user_list and len(user_list) > 0]
+    return user_model_list
+
 
 @router.get("/retrieve_a_user/{user_id}", response_model = UserModel)
 async def retrieve_a_user(user_id):
@@ -67,26 +73,28 @@ async def retrieve_a_user(user_id):
 
     # connection already closed
     query_executor, _, selection_object, _, _ = get_database_utility_tuple()
-    role_list = get_specific_user_roles(selection_object, query_executor, user_id)
+    role_list = get_specific_user_roles(query_executor, selection_object, user_id)
     if role_list or len(role_list) > 0:
         userModel.role_id = role_list[0]["id"]
     return asdict(userModel)
 
+
 @router.get("/retrieve_workspace_users/{workspace_id}", response_model = list[UserModel])
 async def retrieve_a_user(workspace_id):
     query_executor, _, selection_object, _, _ = get_database_utility_tuple()
-    user_list = get_specific_workspace_users(selection_object, query_executor, workspace_id)
+    user_list = get_specific_workspace_users(query_executor, selection_object, workspace_id)
     new_user_list = []
 
     for user_dictionary in user_list:
         userModel = UserModel(**user_dictionary)
         query_executor, _, selection_object, _, _ = get_database_utility_tuple()
-        role_list = get_specific_user_roles(selection_object, query_executor, user_dictionary["id"])
+        role_list = get_specific_user_roles(query_executor, selection_object, user_dictionary["id"])
         if role_list or len(role_list) > 0:
             userModel.role_id = role_list[0]["id"]
         new_user_list.append(asdict(userModel))
 
     return new_user_list
+
 
 @router.post("/update_a_user", response_model = str)
 async def update_a_user(userModel: UserModel):
@@ -98,6 +106,7 @@ async def update_a_user(userModel: UserModel):
     query_executor.close()
 
     return "successfully updated a user"
+
 
 @router.delete("/delete_a_user", response_model = str)
 async def delete_a_user(user_id: str):

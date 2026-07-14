@@ -59,7 +59,7 @@ def initialize_roles():
     with open("data/roles.json") as file:
         role_data = json.load(file)
         role_model_list = [RoleModel(**role_dictionary) for role_dictionary in role_data]
-    saved_role_list = get_roles(selection_object, query_executor)
+    saved_role_list = get_roles(query_executor, selection_object)
 
     if not saved_role_list or len(saved_role_list) == 0:
         idgenerator_obj = IDGenerator("Africa", "Kigali")
@@ -79,7 +79,7 @@ def get_specific_authenticated_user_by_email(email):
     user_dictionary = get_specific_user_by_email(selection_object, query_executor, email)
     authenticated_user = AuthenticatedUserModel(**user_dictionary)
     query_executor, _, selection_object, _, _ = get_database_utility_tuple()
-    role_list = get_specific_user_roles(selection_object, query_executor, user_dictionary["id"])
+    role_list = get_specific_user_roles(query_executor, selection_object, user_dictionary["id"])
     if len(role_list) > 0:
         authenticated_user.roles = role_list
     else:

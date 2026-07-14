@@ -42,8 +42,8 @@ class Insert:
 		query = f"INSERT INTO workflow_case VALUES('{id}', '{legacy_id}', '{name}', '{description}');"
 		return query
 
-	def insert_report(self, id, report_text, optional_document_url, workflow_case_id, step_id, user_id):
-		query = f"INSERT INTO report VALUES('{id}', '{report_text}', '{optional_document_url}', '{workflow_case_id}', '{step_id}', '{user_id}');"
+	def insert_report(self, id, report_text, optional_document_url, submission_time_stamp, workflow_case_id, step_id, user_id):
+		query = f"INSERT INTO report VALUES('{id}', '{report_text}', '{optional_document_url}', '{submission_time_stamp}' '{workflow_case_id}', '{step_id}', '{user_id}');"
 		return query
 
 

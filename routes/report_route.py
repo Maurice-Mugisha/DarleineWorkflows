@@ -1,5 +1,6 @@
 import os
 from fastapi import APIRouter
+from datetime import datetime
 
 from models.report import ReportModel
 from includes.utility_functions import *
@@ -16,7 +17,9 @@ async def register_a_report(reportModel: ReportModel):
     idgenerator_obj = IDGenerator("Africa", "Kigali")
     report_id = idgenerator_obj.generate_report_id()
     step_id = reportModel.step_id
-    report_query = insertion_object.insert_report(report_id, reportModel.report_text, reportModel.optional_document_url, reportModel.workflow_case_id, reportModel.step_id, reportModel.user_id)
+    now = datetime.now()
+    submission_time_stamp = now.strftime("%Y-%m-%d %H:%M:%s")
+    report_query = insertion_object.insert_report(report_id, reportModel.report_text, reportModel.optional_document_url, submission_time_stamp, reportModel.workflow_case_id, reportModel.step_id, reportModel.user_id)
 
     connection_cursor = query_executor.cursor()
     connection_cursor.execute(report_query)
@@ -32,11 +35,13 @@ async def retrieve_all_reports():
     report_list = get_reports(selection_object, query_executor)
     return report_list
 
+
 @router.get("/retrieve_a_report/{report_id}", response_model = ReportModel)
 async def retrieve_a_report(report_id):
     query_executor, _, selection_object, _, _ = get_database_utility_tuple()
     report_dictionary = get_specific_report(selection_object, query_executor, report_id)
     return report_dictionary
+
 
 @router.get("/retrieve_workflow_case_reports/{workflow_case_id}", response_model = list[ReportModel])
 async def retrieve_step_reports(workflow_case_id):
@@ -46,6 +51,7 @@ async def retrieve_step_reports(workflow_case_id):
     if report_list and len(report_list) > 0:
         report_model_list = [ReportModel(**report_dictionary) for report_dictionary in report_list]
     return report_model_list
+
 
 @router.post("/update_a_report", response_model = str)
 async def update_a_report(reportModel: ReportModel):
@@ -57,6 +63,7 @@ async def update_a_report(reportModel: ReportModel):
     query_executor.close()
 
     return "successfully updated a report"
+
 
 @router.delete("/delete_a_report", response_model = str)
 async def delete_a_report(report_id: str):

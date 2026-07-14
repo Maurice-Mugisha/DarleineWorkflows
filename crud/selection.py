@@ -123,7 +123,7 @@ class Select:
 		return query
 
 	def select_workflow_case(self, workflow_case_id):
-		query = f"SELECT * FROM workflow_case WHERE workflow_case_id = '{workflow_case_id}';"
+		query = f"SELECT * FROM workflow_case WHERE id = '{workflow_case_id}';"
 		return query
 
 	def select_count_from_workflow_case(self):
@@ -135,7 +135,7 @@ class Select:
 		return query
 
 	def select_report(self, report_id):
-		query = f"SELECT * FROM report WHERE report_id = '{report_id}';"
+		query = f"SELECT * FROM report WHERE id = '{report_id}';"
 		return query
 
 	def select_count_from_report(self):
@@ -147,11 +147,11 @@ class Select:
 		return query
 
 	def select_report_by_workflow_case_id(self, workflow_case_id):
-		query = f"SELECT * FROM report WHERE step_id = '{workflow_case_id}';"
+		query = f"SELECT * FROM report WHERE workflow_case_id = '{workflow_case_id}';"
 		return query
 
-	def select_report_by_user_id(self, user_id, workflow_case_id):
-		query = f"SELECT * FROM report WHERE step_id = '{user_id}';"
+	def select_report_by_user_id(self, user_id):
+		query = f"SELECT * FROM report WHERE user_id = '{user_id}';"
 		return query
 
 	def select_report_by_workflow_case_step_and_user(self, step_id, user_id, workflow_case_id):

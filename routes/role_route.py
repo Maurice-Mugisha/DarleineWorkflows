@@ -1,7 +1,8 @@
 import os
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
 from models.role import RoleModel
+from models.login import LoginModel
 from includes.utility_functions import *
 from includes.idgenerator import IDGenerator
 from includes.business_logic_functions import *
@@ -28,14 +29,17 @@ async def register_a_role(roleModel: RoleModel):
 @router.get("/retrieve_all_roles", response_model = list[RoleModel])
 async def retrieve_all_roles():
     query_executor, insertion_object, selection_object, _, _ = get_database_utility_tuple()
-    role_list = get_roles(selection_object, query_executor)
+    role_list = get_roles(query_executor, selection_object)
+    role_model_list = [RoleModel(**role_dictionary) for role_dictionary in role_list if role_list and role_list]
     return role_list
+
 
 @router.get("/retrieve_a_role/{role_id}", response_model = RoleModel)
 async def retrieve_a_role(role_id):
     query_executor, _, selection_object, _, _ = get_database_utility_tuple()
     role_dictionary = get_specific_role(selection_object, query_executor, role_id)
     return role_dictionary
+
 
 @router.post("/update_a_role", response_model = str)
 async def update_a_role(roleModel: RoleModel):

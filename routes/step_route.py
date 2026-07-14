@@ -49,29 +49,25 @@ async def register_a_step(stepModel: StepModel):
 async def retrieve_all_steps():
     query_executor, insertion_object, selection_object, _, _ = get_database_utility_tuple()
     step_list = get_steps(selection_object, query_executor)
-    return step_list
+    step_model_list = []
+
+    if step_list and len(step_list) > 0:
+        for step_dictionary in step_list:
+            stepModel = get_step_information(step_dictionary)
+            step_model_list.append(stepModel)
+
+    return step_model_list
+
 
 @router.get("/retrieve_a_step/{step_id}", response_model = StepModel)
 async def retrieve_a_step(step_id):
     query_executor, _, selection_object, _, _ = get_database_utility_tuple()
-    step_dictionary = get_specific_step(selection_object, query_executor, step_id)
+    step_dictionary = get_specific_step(query_executor, selection_object, step_id)
+    if step_dictionary:
+        stepModel = get_step_information(step_dictionary)
+        return stepModel
 
-    query_executor, _, selection_object, _, _ = get_database_utility_tuple()
-    time_list = get_step_times(selection_object, query_executor, step_id)
-    time_model_list = []
-    if time_list and len(time_list) > 0:
-        time_model_list = [asdict(time_dictionary) for time_dictionary in time_list]
-    stepModel = StepModel(**step_dictionary)
-    stepModel.time_list = time_model_list
-
-    query_executor, _, selection_object, _, _ = get_database_utility_tuple()
-    role_list = get_step_roles(selection_obj, query_executor, step_id)
-    role_id_list = []
-    if role_list and len(role_list):
-        role_id_list = [role_dictionary["id"] for role_dictionary in role_list]
-    stepModel.role_id_list = role_id_list
-
-    return stepModel
+    return {}
 
 
 @router.get("/retrieve_workflow_steps/{workflow_id}", response_model = list[StepModel])
@@ -79,31 +75,11 @@ async def retrieve_workflow_steps(workflow_id):
     query_executor, _, selection_object, _, _ = get_database_utility_tuple()
     step_list = get_workflow_steps(selection_object, query_executor, workflow_id)
     step_model_list = []
-    step_id_list = []
 
     if step_list and len(step_list) > 0:
-        step_id_list = [step_dictionary["id"] for step_dictionary in step_list]
-
-    i = 0
-    for step_id in step_id_list:
-
-        query_executor, _, selection_object, _, _ = get_database_utility_tuple()
-        time_list = get_step_times(selection_object, query_executor, step_id)
-        time_model_list = []
-        if time_list and len(time_list) > 0:
-            time_model_list = [TimeModel(**time_dictionary) for time_dictionary in time_list]
-        step_dictionary = step_list[i]
-        stepModel = StepModel(**step_dictionary)
-        stepModel.time_list = time_model_list
-
-        query_executor, _, selection_object, _, _ = get_database_utility_tuple()
-        role_list = get_step_roles(selection_object, query_executor, step_id)
-        role_id_list = []
-        if role_list and len(role_list):
-            role_id_list = [role_dictionary["id"] for role_dictionary in role_list]
-        stepModel.role_id_list = role_id_list
-        step_model_list.append(stepModel)
-        i = i + 1
+        for step_dictionary in step_list:
+            stepModel = get_step_information(step_dictionary)
+            step_model_list.append(stepModel)
 
     return step_model_list
 
@@ -129,3 +105,25 @@ async def delete_a_step(step_id: str):
     query_executor.close()
 
     return "successfully deleted a step"
+
+def get_step_information(step_dictionary):
+
+    step_id = step_dictionary["id"]
+    query_executor, insertion_object, selection_object, update_object, deletion_object = get_database_utility_tuple()
+    step_dictionary = get_specific_step(query_executor, selection_object, step_id)
+
+    query_executor, _, selection_object, _, _ = get_database_utility_tuple()
+    time_list = get_step_times(query_executor, selection_object, step_id)
+    time_model_list = []
+    if time_list and len(time_list) > 0:
+        time_model_list = [TimeModel(**time_dictionary) for time_dictionary in time_list]
+    stepModel = StepModel(**step_dictionary)
+    stepModel.time_list = time_model_list
+
+    query_executor, _, selection_object, _, _ = get_database_utility_tuple()
+    role_list = get_step_roles(query_executor, selection_object, step_id)
+    role_id_list = []
+    if role_list and len(role_list):
+        role_id_list = [role_dictionary["id"] for role_dictionary in role_list]
+    stepModel.role_id_list = role_id_list
+    return stepModel

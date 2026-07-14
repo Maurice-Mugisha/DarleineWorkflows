@@ -1,10 +1,13 @@
 import os
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
 from models.workflow import WorkflowModel
+from models.login import LoginModel
 from includes.utility_functions import *
 from includes.idgenerator import IDGenerator
 from includes.business_logic_functions import *
+from includes.utility_functions import *
+
 
 
 router = APIRouter(prefix="/workflow", tags=["workflow"])
@@ -27,10 +30,17 @@ async def register_a_workflow(workflowModel: WorkflowModel):
 
 
 @router.get("/retrieve_all_workflows", response_model = list[WorkflowModel])
-async def retrieve_all_workflows():
+async def retrieve_all_workflows(loginModel: LoginModel = Depends(get_currently_logged_user_info)):
     query_executor, insertion_object, selection_object, _, _ = get_database_utility_tuple()
     workflow_list = get_workflows(selection_object, query_executor)
     return workflow_list
+
+    authenticatedUserModel, role_list = get_specific_authenticated_user_by_email(loginModel.email)
+    workspace_id = authenticatedUserModel.workspace_id
+    query_executor, insertion_object, selection_object, _, _ = get_database_utility_tuple()
+    workflow_list = get_specific_workspace_workflows(query_executor, selection_object, workspace_id)
+    workflow_model_list = [RoleModel(**workflow_dictionary) for workflow_dictionary in workflow_list if workflow_list and len(workflow_list) > 0]
+    return workflow_model_list
 
 @router.get("/retrieve_a_workflow/{workflow_id}", response_model = WorkflowModel)
 async def retrieve_a_workflow(workflow_id):
@@ -41,7 +51,7 @@ async def retrieve_a_workflow(workflow_id):
 @router.get("/retrieve_workspace_workflows/{workspace_id}", response_model = list[WorkflowModel])
 async def retrieve_a_workflow(workspace_id):
     query_executor, _, selection_object, _, _ = get_database_utility_tuple()
-    workflow_list = get_specific_workspace_workflows(selection_object, query_executor, workspace_id)
+    workflow_list = get_specific_workspace_workflows(query_executor, selection_object, workspace_id)
     return workflow_list
 
 @router.post("/update_a_workflow", response_model = str)
