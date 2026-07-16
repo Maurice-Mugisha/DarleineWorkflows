@@ -19,7 +19,15 @@ async def register_a_workflow(workflowModel: WorkflowModel):
     idgenerator_obj = IDGenerator("Africa", "Kigali")
     workflow_id = idgenerator_obj.generate_workflow_id()
     workspace_id = workflowModel.workspace_id
-    workflow_query = insertion_object.insert_workflow(workflow_id, workflowModel.name, workflowModel.description, workflowModel.is_mandatory, workflowModel.number_of_steps, workflowModel.status, workspace_id)
+    workflow_query = insertion_object.insert_workflow(
+        workflow_id,
+        escape_postgres_string(workflowModel.name),
+        escape_postgres_string(workflowModel.description),
+        workflowModel.is_mandatory,
+        workflowModel.number_of_steps,
+        workflowModel.status,
+        workspace_id
+    )
 
     connection_cursor = query_executor.cursor()
     connection_cursor.execute(workflow_query)
@@ -29,24 +37,23 @@ async def register_a_workflow(workflowModel: WorkflowModel):
     return "Successuflly registered a workflow"
 
 
-@router.get("/retrieve_all_workflows", response_model = list[WorkflowModel])
-async def retrieve_all_workflows(loginModel: LoginModel = Depends(get_currently_logged_user_info)):
-    query_executor, insertion_object, selection_object, _, _ = get_database_utility_tuple()
-    workflow_list = get_workflows(selection_object, query_executor)
-    return workflow_list
-
-    authenticatedUserModel, role_list = get_specific_authenticated_user_by_email(loginModel.email)
-    workspace_id = authenticatedUserModel.workspace_id
+@router.get("/retrieve_all_workflows/{workspace_id}", response_model = list[WorkflowModel])
+async def retrieve_all_workflows(workspace_id):
     query_executor, insertion_object, selection_object, _, _ = get_database_utility_tuple()
     workflow_list = get_specific_workspace_workflows(query_executor, selection_object, workspace_id)
-    workflow_model_list = [RoleModel(**workflow_dictionary) for workflow_dictionary in workflow_list if workflow_list and len(workflow_list) > 0]
+    workflow_model_list = []
+    if workflow_list and len(workflow_list) > 0:
+        workflow_model_list = [WorkflowModel(**workflow_dictionary) for workflow_dictionary in workflow_list if workflow_list and len(workflow_list) > 0]
     return workflow_model_list
 
 @router.get("/retrieve_a_workflow/{workflow_id}", response_model = WorkflowModel)
 async def retrieve_a_workflow(workflow_id):
     query_executor, _, selection_object, _, _ = get_database_utility_tuple()
     workflow_dictionary = get_specific_workflow(selection_object, query_executor, workflow_id)
-    return workflow_dictionary
+    if workflow_dictionary is not None:
+        workflow_model = WorkflowModel(**workflow_dictionary)
+        return workflow_model
+    return {}
 
 @router.get("/retrieve_workspace_workflows/{workspace_id}", response_model = list[WorkflowModel])
 async def retrieve_a_workflow(workspace_id):
@@ -57,7 +64,14 @@ async def retrieve_a_workflow(workspace_id):
 @router.post("/update_a_workflow", response_model = str)
 async def update_a_workflow(workflowModel: WorkflowModel):
     query_executor, insertion_object, selection_object, update_object, deletion_object = get_database_utility_tuple()
-    workflow_query = update_object.update_workflow(workflowModel.id, workflowModel.name, workflowModel.description, workflowModel.is_mandatory, workflowModel.number_of_steps, workflowModel.status)
+    workflow_query = update_object.update_workflow(
+        workflowModel.id,
+        escape_postgres_string(workflowModel.name),
+        escape_postgres_string(workflowModel.description),
+        workflowModel.is_mandatory,
+        workflowModel.number_of_steps,
+        workflowModel.status
+    )
     connection_cursor = query_executor.cursor()
     connection_cursor.execute(workflow_query)
     query_executor.commit()

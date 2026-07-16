@@ -14,7 +14,7 @@ from models.authenticated_user import AuthenticatedUserModel
 router = APIRouter(prefix="/authentication", tags=["authentication"])
 
 
-@router.post("/login")
+@router.post("/login", response_model = AuthenticatedUserModel)
 async def login(request: Request, loginModel: LoginModel):
     """
     Simulates a login endpoint.
@@ -27,7 +27,13 @@ async def login(request: Request, loginModel: LoginModel):
         raise HTTPException(status_code=401, detail="Invalid authentication credentials")
     request.session["user"] = asdict(authenticated_user)
     request.session["roles"] = role_list
-    return {"message": f"Successfully logged in as {email}"}
+    send_email(
+        "Login confirmation",
+        authenticated_user.first_name,
+        authenticated_user.email,
+        "This is to inform you that your workflows account has been logged into. If this is not you, please report the incident"
+    )
+    return authenticated_user
 
 
 @router.post("/logout")

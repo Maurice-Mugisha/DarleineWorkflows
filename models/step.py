@@ -12,5 +12,6 @@ class StepModel:
     percentage: float
     warning_threshold: float
     code: str
+    workflow_case_step_status: str | None = None
     role_id_list: list[str] | None = None
     time_list: list[TimeModel] | None = None

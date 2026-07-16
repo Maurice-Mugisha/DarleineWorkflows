@@ -18,13 +18,32 @@ async def register_a_report(reportModel: ReportModel):
     report_id = idgenerator_obj.generate_report_id()
     step_id = reportModel.step_id
     now = datetime.now()
-    submission_time_stamp = now.strftime("%Y-%m-%d %H:%M:%s")
-    report_query = insertion_object.insert_report(report_id, reportModel.report_text, reportModel.optional_document_url, submission_time_stamp, reportModel.workflow_case_id, reportModel.step_id, reportModel.user_id)
+    submission_time_stamp = now.strftime("%Y-%m-%d %H:%M:%S")
+    report_query = insertion_object.insert_report(
+        report_id,
+        escape_postgres_string(reportModel.report_text),
+        escape_postgres_string(reportModel.optional_document_url),
+        submission_time_stamp,
+        reportModel.workflow_case_id,
+        reportModel.step_id,
+        reportModel.user_id
+    )
 
     connection_cursor = query_executor.cursor()
     connection_cursor.execute(report_query)
     query_executor.commit()
     query_executor.close()
+
+    user_dictionary = get_specific_user(selection_object, query_executor, reportModel.user_id)
+    step_dictionary = get_specific_user(selection_object, query_executor, reportModel.step_id)
+    step_name = step_dictionary['name']
+    step_number = step_dictionary['step_number']
+    send_email(
+        "Step execution confirmation",
+        user_dictionary['first_name'],
+        user_dictionary['email'],
+        f"This is to inform you that you have successfully executed the \"{step_name}\" step \"{step_number}\" for the corresponding case."
+    )
 
     return "Successuflly registered a report"
 
@@ -56,7 +75,11 @@ async def retrieve_step_reports(workflow_case_id):
 @router.post("/update_a_report", response_model = str)
 async def update_a_report(reportModel: ReportModel):
     query_executor, insertion_object, selection_object, update_object, deletion_object = get_database_utility_tuple()
-    report_query = update_object.update_report(reportModel.id, reportModel.report_text, reportModel.optional_document_url)
+    report_query = update_object.update_report(
+        reportModel.id,
+        escape_postgres_string(reportModel.report_text),
+        escape_postgres_string(reportModel.optional_document_url)
+    )
     connection_cursor = query_executor.cursor()
     connection_cursor.execute(report_query)
     query_executor.commit()

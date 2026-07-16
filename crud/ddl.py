@@ -193,6 +193,7 @@ class DDL:
 		    CREATE TABLE IF NOT EXISTS stepworkflow_casemap(
 			    step_id VARCHAR(50) NOT NULL,
 				workflow_case_id VARCHAR(50) NOT NULL,
+				status VARCHAR(30) NOT NULL,
 				PRIMARY KEY(step_id, workflow_case_id),
 				CONSTRAINT FKEY_3_2 FOREIGN KEY(step_id) REFERENCES step(id) ON UPDATE CASCADE ON DELETE CASCADE,
 				CONSTRAINT FKEY_4_2 FOREIGN KEY(workflow_case_id) REFERENCES workflow_case(id) ON UPDATE CASCADE ON DELETE CASCADE

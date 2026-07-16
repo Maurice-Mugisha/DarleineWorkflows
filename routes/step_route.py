@@ -21,7 +21,17 @@ async def register_a_step(stepModel: StepModel):
     role_id_list = stepModel.role_id_list
     time_list = stepModel.time_list
 
-    step_query = insertion_object.insert_step(step_id, stepModel.name, stepModel.description, stepModel.code, stepModel.step_number, stepModel.percentage, stepModel.status, stepModel.warning_threshold, stepModel.workflow_id)
+    step_query = insertion_object.insert_step(
+        step_id,
+        escape_postgres_string(stepModel.name),
+        escape_postgres_string(stepModel.description),
+        escape_postgres_string(stepModel.code),
+        stepModel.step_number,
+        stepModel.percentage,
+        escape_postgres_string(stepModel.status),
+        stepModel.warning_threshold,
+        stepModel.workflow_id
+    )
     connection_cursor = query_executor.cursor()
     connection_cursor.execute(step_query)
 
@@ -87,7 +97,16 @@ async def retrieve_workflow_steps(workflow_id):
 @router.post("/update_a_step", response_model = str)
 async def update_a_step(stepModel: StepModel):
     query_executor, insertion_object, selection_object, update_object, deletion_object = get_database_utility_tuple()
-    step_query = update_object.update_step(stepModel.id, stepModel.name, stepModel.description, stepModel.code, stepModel.step_number, stepModel.percentage, stepModel.status, stepModel.warning_threshold)
+    step_query = update_object.update_step(
+        stepModel.id,
+        escape_postgres_string(stepModel.name),
+        escape_postgres_string(stepModel.description),
+        escape_postgres_string(stepModel.code),
+        stepModel.step_number,
+        stepModel.percentage,
+        escape_postgres_string(stepModel.status),
+        stepModel.warning_threshold
+    )
     connection_cursor = query_executor.cursor()
     connection_cursor.execute(step_query)
     query_executor.commit()

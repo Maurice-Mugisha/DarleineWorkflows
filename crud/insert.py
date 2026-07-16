@@ -43,7 +43,7 @@ class Insert:
 		return query
 
 	def insert_report(self, id, report_text, optional_document_url, submission_time_stamp, workflow_case_id, step_id, user_id):
-		query = f"INSERT INTO report VALUES('{id}', '{report_text}', '{optional_document_url}', '{submission_time_stamp}' '{workflow_case_id}', '{step_id}', '{user_id}');"
+		query = f"INSERT INTO report VALUES('{id}', '{report_text}', '{optional_document_url}', '{submission_time_stamp}', '{workflow_case_id}', '{step_id}', '{user_id}');"
 		return query
 
 
@@ -60,8 +60,8 @@ class Insert:
 		query = f"INSERT INTO steprolemap VALUES('{step_id}', '{role_id}');"
 		return query
 
-	def insert_stepworkflow_casemap(self, step_id, workflow_case_id):
-		query = f"INSERT INTO stepworkflow_casemap VALUES('{step_id}', '{workflow_case_id}');"
+	def insert_stepworkflow_casemap(self, step_id, workflow_case_id, status):
+		query = f"INSERT INTO stepworkflow_casemap VALUES('{step_id}', '{workflow_case_id}', '{status}');"
 		return query
 
 	def insert_roleprivilegemap(self, role_id, privilege_id):

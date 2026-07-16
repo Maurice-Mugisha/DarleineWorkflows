@@ -43,7 +43,15 @@ async def register_a_user(userModel: UserModel):
     if not role_dictionary:
         return "No such role has been found"
 
-    user_query = insertion_object.insert_user(user_id, userModel.first_name, userModel.last_name, userModel.job_title, userModel.email, userModel.password, workspace_id)
+    user_query = insertion_object.insert_user(
+        user_id,
+        escape_postgres_string(userModel.first_name),
+        escape_postgres_string(userModel.last_name),
+        escape_postgres_string(userModel.job_title),
+        escape_postgres_string(userModel.email),
+        escape_postgres_string(userModel.password),
+        workspace_id
+    )
     connection_cursor = query_executor.cursor()
     connection_cursor.execute(user_query)
     connection_cursor.execute(user_role_map_query)
@@ -53,14 +61,22 @@ async def register_a_user(userModel: UserModel):
     return "Successuflly registered a user"
 
 
-@router.get("/retrieve_all_users", response_model = list[UserModel])
-async def retrieve_all_users(loginModel: LoginModel = Depends(get_currently_logged_user_info)):
-    authenticatedUserModel, role_list = get_specific_authenticated_user_by_email(loginModel.email)
-    workspace_id = authenticatedUserModel.workspace_id
-    query_executor, insertion_object, selection_object, _, _ = get_database_utility_tuple()
+@router.get("/retrieve_all_users/{workspace_id}", response_model = list[UserModel])
+async def retrieve_all_users(workspace_id):
+    query_executor, _, selection_object, _, _ = get_database_utility_tuple()
     user_list = get_specific_workspace_users(query_executor, selection_object, workspace_id)
-    user_model_list = [UserModel(**user_dictionary) for user_dictionary in user_list if user_list and len(user_list) > 0]
-    return user_model_list
+    new_user_model_list = []
+
+    if user_list and len(user_list) > 0:
+        for user_dictionary in user_list:
+            userModel = UserModel(**user_dictionary)
+            query_executor, _, selection_object, _, _ = get_database_utility_tuple()
+            role_list = get_specific_user_roles(query_executor, selection_object, user_dictionary["id"])
+            if role_list or len(role_list) > 0:
+                userModel.role_id = role_list[0]["id"]
+            new_user_model_list.append(userModel)
+
+    return new_user_model_list
 
 
 @router.get("/retrieve_a_user/{user_id}", response_model = UserModel)
@@ -99,7 +115,14 @@ async def retrieve_a_user(workspace_id):
 @router.post("/update_a_user", response_model = str)
 async def update_a_user(userModel: UserModel):
     query_executor, insertion_object, selection_object, update_object, deletion_object = get_database_utility_tuple()
-    user_query = update_object.update_user(userModel.id, userModel.first_name, userModel.last_name, userModel.job_title, userModel.email, userModel.password)
+    user_query = update_object.update_user(
+        userModel.id,
+        escape_postgres_string(userModel.first_name),
+        escape_postgres_string(userModel.last_name),
+        escape_postgres_string(userModel.job_title),
+        escape_postgres_string(userModel.email),
+        escape_postgres_string(userModel.password),
+    )
     connection_cursor = query_executor.cursor()
     connection_cursor.execute(user_query)
     query_executor.commit()

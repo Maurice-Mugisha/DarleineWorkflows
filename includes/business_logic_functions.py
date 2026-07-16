@@ -408,7 +408,8 @@ def get_specific_workflow_case_steps(query_executor, selection_obj, workflow_cas
 	stepworkflow_casemap_list = cursor.fetchall()
 	for row in stepworkflow_casemap_list:
 		step_id = row['step_id']
-		step_dictionary= cursor.execute(selection_obj.select_step(step_id))
+		cursor.execute(selection_obj.select_step(step_id))
+		step_dictionary = cursor.fetchone()
 		step_list.append(step_dictionary)
 	cursor.close()
 	query_executor.close()

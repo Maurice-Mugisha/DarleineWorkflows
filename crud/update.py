@@ -119,11 +119,26 @@ class Update:
 				   SET
 				       legacy_id = '{legacy_id}',
 					   name = '{name}',
-					   description = {description}
+					   description = '{description}'
 				   WHERE
 					   id = '{id}'
 				""";
 		return query
+
+
+	def update_stepworkflow_casemap(self, workflow_case_id, step_id, status):
+		query = f"""
+				   UPDATE
+					   stepworkflow_casemap
+				   SET
+					   status = '{status}'
+				   WHERE
+					   workflow_case_id = '{workflow_case_id}'
+				   AND
+					   step_id = '{step_id}'
+				""";
+		return query
+		
 
 	def update_report(self, id, report_text, optional_document_url):
 		query = f"""
