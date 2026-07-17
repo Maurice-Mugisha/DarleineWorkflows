@@ -19,18 +19,19 @@ async def register_a_workflow(workflowModel: WorkflowModel):
     idgenerator_obj = IDGenerator("Africa", "Kigali")
     workflow_id = idgenerator_obj.generate_workflow_id()
     workspace_id = workflowModel.workspace_id
-    workflow_query = insertion_object.insert_workflow(
+    workflow_data_tuple = (
         workflow_id,
-        escape_postgres_string(workflowModel.name),
-        escape_postgres_string(workflowModel.description),
+        workflowModel.name,
+        workflowModel.description,
         workflowModel.is_mandatory,
         workflowModel.number_of_steps,
         workflowModel.status,
-        workspace_id
+        workspace_id,
     )
+    workflow_query = insertion_object.insert_workflow()
 
     connection_cursor = query_executor.cursor()
-    connection_cursor.execute(workflow_query)
+    connection_cursor.execute(workflow_query, workflow_data_tuple)
     query_executor.commit()
     query_executor.close()
 
@@ -64,16 +65,17 @@ async def retrieve_a_workflow(workspace_id):
 @router.post("/update_a_workflow", response_model = str)
 async def update_a_workflow(workflowModel: WorkflowModel):
     query_executor, insertion_object, selection_object, update_object, deletion_object = get_database_utility_tuple()
-    workflow_query = update_object.update_workflow(
-        workflowModel.id,
-        escape_postgres_string(workflowModel.name),
-        escape_postgres_string(workflowModel.description),
+    workflow_data_tuple = (
+        workflowModel.name,
+        workflowModel.description,
         workflowModel.is_mandatory,
         workflowModel.number_of_steps,
-        workflowModel.status
+        workflowModel.status,
+        workflowModel.id,
     )
+    workflow_query = update_object.update_workflow()
     connection_cursor = query_executor.cursor()
-    connection_cursor.execute(workflow_query)
+    connection_cursor.execute(workflow_query, workflow_data_tuple)
     query_executor.commit()
     query_executor.close()
 

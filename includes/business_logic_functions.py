@@ -137,7 +137,7 @@ def get_specific_privilege(selection_obj, query_executor, privilege_id):
 
 
 
-def get_specific_user(selection_obj, query_executor, user_id):
+def get_specific_user(query_executor, selection_obj, user_id):
 
 	user_dictionary = {}
 	cursor = query_executor.cursor()
@@ -216,7 +216,7 @@ def get_workflow_steps(selection_obj, query_executor, workflow_id):
 
 
 
-def get_specific_time(selection_obj, query_executor, time_id):
+def get_specific_time(query_executor, selection_obj, time_id):
 
 	time_dictionary = {}
 	cursor = query_executor.cursor()

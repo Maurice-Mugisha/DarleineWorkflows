@@ -10,19 +10,19 @@ class Update:
 		return self.instance_name
 
 
-	def update_workspace(self, id, name, description, language, organization_type, email, country):
+	def update_workspace(self):
 		query = f"""
 		           UPDATE
 				       workspace
 				   SET
-				       name = '{name}',
-					   description = '{description}',
-					   language = '{language}',
-					   organization_type = '{organization_type}',
-					   email = '{email}',
-					   country = '{country}'
+				       name = %s,
+					   description = %s,
+					   language = %s,
+					   organization_type = %s,
+					   email = %s,
+					   country = %s
 				   WHERE
-					   id = '{id}'
+					   id = %s
 				""";
 		return query
 
@@ -66,35 +66,35 @@ class Update:
 				""";
 		return query
 
-	def update_workflow(self, id, name, description, is_mandatory, number_of_steps, status):
+	def update_workflow(self):
 		query = f"""
 		           UPDATE
 				       workflow
 				   SET
-				       name = '{name}',
-					   description = '{description}',
-					   is_mandatory = '{is_mandatory}',
-					   number_of_steps = {number_of_steps},
-					   status = '{status}'
+				       name = %s,
+					   description = %s,
+					   is_mandatory = %s,
+					   number_of_steps = %s,
+					   status = %s
 				   WHERE
-					   id = '{id}'
+					   id = %s
 				""";
 		return query
 
-	def update_step(self, id, name, description, code, step_number, percentage, status, warning_threshold):
+	def update_step(self):
 		query = f"""
 		           UPDATE
 				       step
 				   SET
-				       name = '{name}',
-					   description = '{description}',
-					   code = '{code}',
-					   step_number = {step_number},
-					   percentage = {percentage},
-					   status = '{status}',
-					   warning_threshold = '{warning_threshold}'
+				       name = %s,
+					   description = %s,
+					   code = %s,
+					   step_number = %s,
+					   percentage = %s,
+					   status = %s,
+					   warning_threshold = %s
 				   WHERE
-					   id = '{id}'
+					   id = %s
 				""";
 		return query
 
@@ -112,16 +112,16 @@ class Update:
 				""";
 		return query
 
-	def update_workflow_case(self, id, legacy_id, name, description):
+	def update_workflow_case(self):
 		query = f"""
 		           UPDATE
 				       workflow_case
 				   SET
-				       legacy_id = '{legacy_id}',
-					   name = '{name}',
-					   description = '{description}'
+				       legacy_id = %s,
+					   name = %s,
+					   description = %s
 				   WHERE
-					   id = '{id}'
+					   id = %s
 				""";
 		return query
 
@@ -138,16 +138,16 @@ class Update:
 					   step_id = '{step_id}'
 				""";
 		return query
-		
 
-	def update_report(self, id, report_text, optional_document_url):
+
+	def update_report(self):
 		query = f"""
 		           UPDATE
 				       report
 				   SET
-				       report_text = '{report_text}',
-					   optional_document_url = '{optional_document_url}'
+				       report_text = %s,
+					   optional_document_url = %s
 				   WHERE
-					   id = '{id}'
+					   id = %s
 				""";
 		return query

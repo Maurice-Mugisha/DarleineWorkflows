@@ -19,23 +19,27 @@ async def register_a_report(reportModel: ReportModel):
     step_id = reportModel.step_id
     now = datetime.now()
     submission_time_stamp = now.strftime("%Y-%m-%d %H:%M:%S")
-    report_query = insertion_object.insert_report(
+    report_data_tuple = (
         report_id,
-        escape_postgres_string(reportModel.report_text),
-        escape_postgres_string(reportModel.optional_document_url),
+        reportModel.report_text,
+        reportModel.optional_document_url,
         submission_time_stamp,
         reportModel.workflow_case_id,
         reportModel.step_id,
         reportModel.user_id
     )
+    report_query = insertion_object.insert_report()
 
     connection_cursor = query_executor.cursor()
-    connection_cursor.execute(report_query)
+    connection_cursor.execute(report_query, report_data_tuple)
     query_executor.commit()
     query_executor.close()
 
-    user_dictionary = get_specific_user(selection_object, query_executor, reportModel.user_id)
-    step_dictionary = get_specific_user(selection_object, query_executor, reportModel.step_id)
+    query_executor, insertion_object, selection_object, update_object, deletion_object = get_database_utility_tuple()
+    user_dictionary = get_specific_user(query_executor, selection_object, reportModel.user_id)
+
+    query_executor, insertion_object, selection_object, update_object, deletion_object = get_database_utility_tuple()
+    step_dictionary = get_specific_step(query_executor, selection_object, reportModel.step_id)
     step_name = step_dictionary['name']
     step_number = step_dictionary['step_number']
     send_email(
@@ -75,13 +79,14 @@ async def retrieve_step_reports(workflow_case_id):
 @router.post("/update_a_report", response_model = str)
 async def update_a_report(reportModel: ReportModel):
     query_executor, insertion_object, selection_object, update_object, deletion_object = get_database_utility_tuple()
-    report_query = update_object.update_report(
+    report_data_tuple = (
+        reportModel.report_text,
+        reportModel.optional_document_url,
         reportModel.id,
-        escape_postgres_string(reportModel.report_text),
-        escape_postgres_string(reportModel.optional_document_url)
     )
+    report_query = update_object.update_report()
     connection_cursor = query_executor.cursor()
-    connection_cursor.execute(report_query)
+    connection_cursor.execute(report_query, report_data_tuple)
     query_executor.commit()
     query_executor.close()
 

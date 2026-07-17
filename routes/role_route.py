@@ -33,12 +33,12 @@ async def register_a_role(roleModel: RoleModel):
 @router.get("/retrieve_all_roles/{workspace_id}", response_model = list[RoleModel])
 async def retrieve_all_roles(workspace_id):
     query_executor, _, selection_object, _, _ = get_database_utility_tuple()
-    role_list = get_specific_workspace_roles(query_executor, selection_object, workspace_id)
+    role_list = get_roles(query_executor, selection_object) # get_specific_workspace_roles(query_executor, selection_object, workspace_id)
     role_model_list = []
 
     if role_list and len(role_list) > 0:
         for role_dictionary in role_list:
-            roleModel = UserModel(**role_dictionary)
+            roleModel = RoleModel(**role_dictionary)
             role_model_list.append(roleModel)
 
     return role_model_list

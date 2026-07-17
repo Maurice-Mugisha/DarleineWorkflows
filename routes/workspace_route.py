@@ -15,26 +15,28 @@ async def register_a_workspace(workspaceModel: WorkspaceModel):
     query_executor, insertion_object, selection_object, update_object, deletion_object = get_database_utility_tuple()
     idgenerator_obj = IDGenerator("Africa", "Kigali")
     workspace_id = idgenerator_obj.generate_workspace_id()
-    workspace_query = insertion_object.insert_workspace(
+    workspace_data_tuple = (
         workspace_id,
-        escape_postgres_string(workspaceModel.name),
-        escape_postgres_string(workspaceModel.description),
+        workspaceModel.name,
+        workspaceModel.description,
         workspaceModel.language,
         workspaceModel.organization_type,
-        escape_postgres_string(workspaceModel.email),
-        workspaceModel.country
+        workspaceModel.email,
+        workspaceModel.country,
     )
+    workspace_query = insertion_object.insert_workspace()
     admin = workspaceModel.admin
     user_id = idgenerator_obj.generate_user_id()
-    user_query = insertion_object.insert_user(
+    user_data_tuple = (
         user_id,
-        escape_postgres_string(admin.first_name),
-        escape_postgres_string(admin.last_name),
-        escape_postgres_string(admin.job_title),
-        escape_postgres_string(admin.email),
-        escape_postgres_string(admin.password),
-        workspace_id
+        admin.first_name,
+        admin.last_name,
+        admin.job_title,
+        admin.email,
+        admin.password,
+        workspace_id,
     )
+    user_query = insertion_object.insert_user()
 
     role_query = selection_object.select_role_by_name("Workspace admin")
     connection_cursor = query_executor.cursor()
@@ -45,8 +47,8 @@ async def register_a_workspace(workspaceModel: WorkspaceModel):
     user_role_map_query = insertion_object.insert_userrolemap(user_id, role_id)
 
     connection_cursor = query_executor.cursor()
-    connection_cursor.execute(workspace_query)
-    connection_cursor.execute(user_query)
+    connection_cursor.execute(workspace_query, workspace_data_tuple)
+    connection_cursor.execute(user_query, user_data_tuple)
     connection_cursor.execute(user_role_map_query)
     query_executor.commit()
     query_executor.close()
@@ -87,17 +89,18 @@ async def retrieve_a_workspace(workspace_id):
 @router.post("/update_a_workspace", response_model = str)
 async def update_a_workspace(workspaceModel: WorkspaceModel):
     query_executor, insertion_object, selection_object, update_object, deletion_object = get_database_utility_tuple()
-    workspace_query = update_object.update_workspace(
-        workspace_id,
-        escape_postgres_string(workspaceModel.name),
-        escape_postgres_string(workspaceModel.description),
+    workspace_data_tuple = (
+        workspaceModel.name,
+        workspaceModel.description,
         workspaceModel.language,
         workspaceModel.organization_type,
-        escape_postgres_string(workspaceModel.email),
-        workspaceModel.country
+        workspaceModel.email,
+        workspaceModel.country,
+        workspace_id,
     )
+    workspace_query = update_object.update_workspace()
     connection_cursor = query_executor.cursor()
-    connection_cursor.execute(workspace_query)
+    connection_cursor.execute(workspace_query, workspace_data_tuple)
     query_executor.commit()
     query_executor.close()
 

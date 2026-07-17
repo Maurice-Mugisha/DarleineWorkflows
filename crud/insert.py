@@ -10,16 +10,20 @@ class Insert:
 		return self.instance_name
 
 
-	def insert_workspace(self, id, name, description, language, organization_type, email, country):
-		query = f"INSERT INTO workspace VALUES('{id}', '{name}', '{description}', '{language}', '{organization_type}', '{email}', '{country}');"
+	def insert_workspace(self):
+		query = """INSERT INTO workspace (id, name, description, language, organization_type, email, country) VALUES(%s, %s, %s, %s, %s, %s, %s);"""
 		return query
 
-	def insert_workflow(self, id, name, description, is_mandatory, number_of_steps, status, workspace_id):
-		query = f"INSERT INTO workflow VALUES('{id}', '{name}', '{description}', '{is_mandatory}', {number_of_steps}, '{status}', '{workspace_id}');"
+	def insert_workflow(self):
+		query = """
+	        INSERT INTO workflow
+	        (id, name, description, is_mandatory, number_of_steps, status, workspace_id)
+	        VALUES (%s, %s, %s, %s, %s, %s, %s);
+	    """
 		return query
 
-	def insert_user(self, id, first_name, last_name, job_title, email, password, workspace_id):
-		query = f"INSERT INTO workspace_user VALUES('{id}', '{first_name}', '{last_name}', '{job_title}', '{email}', '{password}', '{workspace_id}');"
+	def insert_user(self):
+		query = """INSERT INTO workspace_user (id, first_name, last_name, job_title, email, password, workspace_id) VALUES(%s, %s, %s, %s, %s, %s, %s);"""
 		return query
 
 	def insert_role(self, id, name, description):
@@ -30,8 +34,12 @@ class Insert:
 		query = f"INSERT INTO privilege VALUES('{id}', '{name}', '{description}');"
 		return query
 
-	def insert_step(self, id, name, description, code, step_number, percentage, status, warning_threshold, workflow_id):
-		query = f"INSERT INTO step VALUES('{id}', '{name}', '{description}', '{code}', {step_number}, {percentage}, '{status}', {warning_threshold}, '{workflow_id}');"
+	def insert_step(self):
+		query = """
+	        INSERT INTO step
+	        (id, name, description, code, step_number, percentage, status, warning_threshold, workflow_id)
+	        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);
+	    """
 		return query
 
 	def insert_time(self, id, time_unit, time_unit_category, time_unit_value, step_id):
@@ -42,10 +50,21 @@ class Insert:
 		query = f"INSERT INTO workflow_case VALUES('{id}', '{legacy_id}', '{name}', '{description}');"
 		return query
 
-	def insert_report(self, id, report_text, optional_document_url, submission_time_stamp, workflow_case_id, step_id, user_id):
-		query = f"INSERT INTO report VALUES('{id}', '{report_text}', '{optional_document_url}', '{submission_time_stamp}', '{workflow_case_id}', '{step_id}', '{user_id}');"
+	def insert_workflow_case(self):
+		query = """
+	        INSERT INTO workflow_case
+	        (id, legacy_id, name, description)
+	        VALUES (%s, %s, %s, %s);
+	    """
 		return query
 
+	def insert_report(self):
+		query = """
+	        INSERT INTO report
+	        (id, report_text, optional_document_url, submission_time_stamp, workflow_case_id, step_id, user_id)
+	        VALUES (%s, %s, %s, %s, %s, %s, %s);
+	    """
+		return query
 
 
 	def insert_workspacerolemap(self, workspace_id, role_id):

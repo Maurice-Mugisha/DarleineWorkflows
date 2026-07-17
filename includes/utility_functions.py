@@ -2,7 +2,7 @@ import os
 
 from fastapi import Request, HTTPException
 import json
-from psycopg2.extensions import adapt
+from psycopg2.extensions import QuotedString, adapt
 
 from crud.insert import Insert
 from crud.selection import Select
@@ -109,11 +109,12 @@ def escape_postgres_string(value: str) -> str:
     if value is None:
         return "NULL"
 
+    return value
     # adapt() handles single quotes, backslashes, and null bytes
     adapted_value = adapt(value)
 
     # Returns the properly quoted and escaped string
-    return adapted_value.getquoted().decode('utf-8')
+    return QuotedString(value).getquoted().decode("utf-8")#adapted_value.getquoted().decode('utf-8')
 
 
 
